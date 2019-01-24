@@ -54,6 +54,7 @@ public class OnErrorActivity extends BaseActivity {
 
     private Observable<String> onErrorReturnObserver() {
         return createObserver().onErrorReturn(new Func1<Throwable, String>() {
+//           会被next 接收到。
             @Override
             public String call(Throwable throwable) {
                 return "onErrorReturn";
@@ -80,3 +81,4 @@ public class OnErrorActivity extends BaseActivity {
         });
     }
 }
+// 全程不会执行 onerror

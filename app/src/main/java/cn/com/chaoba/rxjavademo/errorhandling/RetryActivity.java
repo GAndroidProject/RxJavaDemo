@@ -56,28 +56,37 @@ public class RetryActivity extends BaseActivity {
     }
 
     private Observable<Integer> retryObserver() {
+        //        重试2次，1+2就是3次
         return createObserver().retry(2);
     }
 
     private Observable<Integer> retryWhenObserver() {
+        //      遇到错误就执行retryWhen，所以最后重试的次数由 zip 中的just中的个数确定。
         return createObserver().retryWhen(
                 new Func1<Observable<? extends Throwable>, Observable<?>>() {
                     @Override
                     public Observable<?> call(Observable<? extends Throwable> observable) {
-                        return observable.zipWith(Observable.just(1, 2, 3),
+                        return observable.zipWith(Observable.just(2, 3, 4, 5),
                                 new Func2<Throwable, Integer, String>() {
                                     @Override
                                     public String call(Throwable throwable, Integer integer) {
+                                        //                    速度太快看不出来一次一次执行
+                                        //   log(throwable.getMessage() + integer);
+                                        // 把"#Exception#" 字符串和 just（）依次发射出的值拼接
                                         return throwable.getMessage() + integer;
                                     }
                                 })
                                 .flatMap(new Func1<String, Observable<Long>>() {
                                     @Override
                                     public Observable<Long> call(String s) {
+                                        //    把zip中拼接的异常输出。
                                         log(s);
+                                        //   返回一个Observable，计时执行，
                                         return Observable.timer(1, TimeUnit.SECONDS);
+                                        //  return Observable.just( 1L);
                                     }
-                                });
+                                })
+                                ;
                     }
                 });
     }
@@ -89,7 +98,7 @@ public class RetryActivity extends BaseActivity {
                 log("subscribe");
                 for (int i = 0; i < 3; i++) {
                     if (i == 2) {
-                        subscriber.onError(new Exception("Exception"));
+                        subscriber.onError(new Exception("#Exception#"));
                     } else {
                         subscriber.onNext(i);
                     }
@@ -99,3 +108,6 @@ public class RetryActivity extends BaseActivity {
     }
 
 }
+
+// retry  执行 onError结束， retryWhen 执行 complete结束
+//

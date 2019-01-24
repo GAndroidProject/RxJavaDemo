@@ -6,7 +6,6 @@ import android.view.View;
 import java.util.ArrayList;
 
 import cn.com.chaoba.rxjavademo.BaseActivity;
-import cn.com.chaoba.rxjavademo.R;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -70,3 +69,5 @@ public class FlatMapActivity extends BaseActivity {
 
 
 }
+
+// map 的结果是普通对象，  flatmap的还是一个Observable。
