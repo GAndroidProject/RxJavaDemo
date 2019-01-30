@@ -124,4 +124,10 @@ public class DoActivity extends BaseActivity {
     }
 
 
+
+
 }
+/**
+ *  doOnNext  是先于  OnNext 执行的。
+ *
+ */
