@@ -1,14 +1,19 @@
 package cn.com.chaoba.rxjavademo.errorhandling;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
 import cn.com.chaoba.rxjavademo.BaseActivity;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 public class RetryActivity extends BaseActivity {
 
@@ -62,7 +67,8 @@ public class RetryActivity extends BaseActivity {
 
     private Observable<Integer> retryWhenObserver() {
         //      遇到错误就执行retryWhen，所以最后重试的次数由 zip 中的just中的个数确定。
-        return createObserver().retryWhen(
+        return createObserver().
+                retryWhen(
                 new Func1<Observable<? extends Throwable>, Observable<?>>() {
                     @Override
                     public Observable<?> call(Observable<? extends Throwable> observable) {
@@ -76,6 +82,34 @@ public class RetryActivity extends BaseActivity {
                                         return throwable.getMessage() + integer;
                                     }
                                 })
+                                .flatMap(new Func1<String, Observable<String>>() {
+                                    @Override
+                                    public Observable<String> call(String s) {
+                                       return createObserver1()
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .doOnCompleted(new Action0() {
+                                                    @Override
+                                                    public void call() {
+                                                        Log.i("ErrorInterceptor:","doOnCompleted");
+                                                    }
+                                                })
+//                                               会被执行
+                                                .doOnError(new Action1<Throwable>() {
+                                                    @Override
+                                                    public void call(Throwable throwable) {
+                                                        Log.i("ErrorInterceptor:","doOnError");
+                                                    }
+                                                })
+                                                .doOnNext(new Action1<String>() {
+                                                    @Override
+                                                    public void call(String s) {
+                                                        log(s);
+                                                        Log.i("ErrorInterceptor:","doOnNext");
+                                                    }
+                                                });
+                                    }
+                                })
                                 .flatMap(new Func1<String, Observable<Long>>() {
                                     @Override
                                     public Observable<Long> call(String s) {
@@ -85,10 +119,10 @@ public class RetryActivity extends BaseActivity {
                                         return Observable.timer(1, TimeUnit.SECONDS);
                                         //  return Observable.just( 1L);
                                     }
-                                })
-                                ;
+                                });
                     }
                 });
+//                .onErrorResumeNext();
     }
 
     private Observable<Integer> createObserver() {
@@ -107,7 +141,23 @@ public class RetryActivity extends BaseActivity {
         });
     }
 
+    private Observable<String> createObserver1() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                log("subscribe");
+                for (int i = 0; i < 3; i++) {
+                    if (i == 2) {
+                        subscriber.onError(new Exception("#Exception#"));
+                    } else {
+                        subscriber.onNext(i+"");
+                    }
+                }
+            }
+        });
+    }
 }
+
 
 // retry  执行 onError结束， retryWhen 执行 complete结束
 //
