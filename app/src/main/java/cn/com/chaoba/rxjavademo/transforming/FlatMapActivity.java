@@ -46,7 +46,7 @@ public class FlatMapActivity extends BaseActivity {
                 .flatMap(new Func1<Integer, Observable<String>>() {
                     @Override
                     public Observable<String> call(Integer integer) {
-                        return Observable.just("flat map:" + integer);
+                        return Observable.just("flat map:" + integer,"d2:"+integer+1);
                     }
                 });
     }
