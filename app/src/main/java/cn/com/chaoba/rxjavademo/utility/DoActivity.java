@@ -88,6 +88,12 @@ public class DoActivity extends BaseActivity {
                                 + " type:" + notification.getKind());
                     }
                 })
+                .doOnNext(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer integer) {
+                        log("doOnNext send " + integer);
+                    }
+                })
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
@@ -113,7 +119,7 @@ public class DoActivity extends BaseActivity {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 for (int i = 1; i <= 5; i++) {
-                    if (i <= 3) {
+                    if (i <= 2) {
                         subscriber.onNext(i);
                     } else {
                         subscriber.onError(new Throwable("num>3"));
@@ -124,10 +130,8 @@ public class DoActivity extends BaseActivity {
     }
 
 
-
-
 }
+
 /**
- *  doOnNext  是先于  OnNext 执行的。
- *
+ 由按钮"doOnError"的执行结果，可以看出 doOnNext是先于onNext执行的。
  */

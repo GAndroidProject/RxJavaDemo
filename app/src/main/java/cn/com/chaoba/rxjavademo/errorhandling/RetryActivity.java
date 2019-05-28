@@ -114,7 +114,7 @@ public class RetryActivity extends BaseActivity {
                                     @Override
                                     public Observable<Long> call(String s) {
                                         //    把zip中拼接的异常输出。
-                                        log(s);
+                                        log("flatMap:"+s);
                                         //   返回一个Observable，计时执行，
                                         return Observable.timer(1, TimeUnit.SECONDS);
                                         //  return Observable.just( 1L);
@@ -134,6 +134,7 @@ public class RetryActivity extends BaseActivity {
                     if (i == 2) {
                         subscriber.onError(new Exception("#Exception#"));
                     } else {
+//                        zip的内容被这个执行
                         subscriber.onNext(i);
                     }
                 }
@@ -160,4 +161,6 @@ public class RetryActivity extends BaseActivity {
 
 
 // retry  执行 onError结束， retryWhen 执行 complete结束
+
+
 //
