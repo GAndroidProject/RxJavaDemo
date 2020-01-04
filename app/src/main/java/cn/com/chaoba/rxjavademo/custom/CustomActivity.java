@@ -4,11 +4,10 @@ import android.os.Bundle;
 
 import cn.com.chaoba.rxjavademo.BaseActivity;
 import rx.Observable;
-import rx.Observable.Operator;
-import rx.Observable.Transformer;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+
 
 public class CustomActivity extends BaseActivity {
 
@@ -36,7 +35,7 @@ public class CustomActivity extends BaseActivity {
     }
 
     private Observable<String> liftObserver() {
-        Operator<String, String> myOperator = new Operator<String, String>() {
+       rx.Observable.Operator<String, String> myOperator = new rx.Observable.Operator<String, String>() {
             @Override
             public Subscriber<? super String> call(
                     Subscriber<? super String> subscriber) {
@@ -82,8 +81,8 @@ public class CustomActivity extends BaseActivity {
     }
 
     private Observable<String> composeObserver() {
-        Transformer<Integer, String> myTransformer =
-                new Transformer<Integer, String>() {
+        rx.Observable.Transformer<Integer, String> myTransformer =
+                new rx.Observable.Transformer<Integer, String>() {
                     @Override
                     public Observable<String> call(
                             Observable<Integer> integerObservable) {
